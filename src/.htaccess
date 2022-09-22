@@ -1,0 +1,2 @@
+# nobody should ever directly access this folder
+Deny from all

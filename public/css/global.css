@@ -1,0 +1,17 @@
+/*  Put all the universal styles here.  */
+
+/* Light mode */
+@media (prefers-color-scheme: light) {
+    body {
+        background-color: white;
+        color: black;
+    }
+}
+
+/*!* Dark mode *!*/
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #2d2d2e;
+        color: #d7dbdf;
+    }
+}
