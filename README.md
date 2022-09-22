@@ -1,15 +1,20 @@
 # PHP Apache Template
-A starter pack my favorite .htaccess config and directory structure.
+A minimal web server starter pack with:
+ - my favorite .htaccess config for php routing
+ - basic directory structure and php entry points
+ - a top level error handler with developer friendly error response 
+ - basic error page 
+ - basic dark mode css
 
 All requests for php files, directories, or sensitive files
 are redirected to the public/index.php.
 
-An additional .htaccess file and index.php in outside the public folder
+An additional failsafe .htaccess file and index.php in outside the public folder
 ensure all requests will still land inside your projects
-public folder in case your hosting provider forces you to
+/public folder in case your hosting provider forces you to
 put your entire project source code in a public html folder.
 
-The php files are minimal entry point and use php7+ features.
+Requires php7 or higher.
 
 ## Licence
 Do what you want with this code.
