@@ -1,0 +1,20 @@
+# Composer
+composer.phar
+/vendor/
+# composer.lock
+
+# IDE / Editors
+/.idea/
+private.env.json
+/.vs/
+/.vscode/
+
+# Temporary | Generated files.
+/temp/
+
+# PhpUnit
+test/report/*
+.phpunit.result.cache
+
+# Node
+/node_modules/
