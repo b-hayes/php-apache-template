@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-//convert all warnings and notices in to errors.
+//convert all warnings and notices in to errors, if PHP is configured to report them.
 set_error_handler(function ($severity, $message, $file, $line) {
     if (!(error_reporting() & $severity)) {
         return;
