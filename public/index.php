@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 //convert all warnings and notices in to errors.
 set_error_handler(function ($severity, $message, $file, $line) {
-    if (!(error_reporting() & $severity)) {//bitwise comparison
-        // php isnt reporting this error so do nothing.
+    if (!(error_reporting() & $severity)) {
         return;
     }
     throw new \ErrorException($message, 0, $severity, $file, $line);
