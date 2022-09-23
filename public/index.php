@@ -12,8 +12,6 @@ set_error_handler(function ($severity, $message, $file, $line) {
 
 
 try {
-    //ensure a consistent working directory in-case funky things happen with htaccess rules.
-    chdir(__DIR__);
     require_once __DIR__ . '/../vendor/autoload.php';
 
     //start your application here.
