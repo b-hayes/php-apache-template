@@ -5,14 +5,13 @@ A minimal web server starter pack with:
  - a top level error handler with developer friendly error response 
  - basic error page 
  - basic dark mode css
+ - minimal docker support
 
 All requests for php files, directories, or sensitive files
 are redirected to the public/index.php.
 
-An additional failsafe .htaccess file and index.php in outside the public folder
-ensure all requests will still land inside your projects
-/public folder in case your hosting provider forces you to
-put your entire project source code in a public html folder.
+An additional .htaccess and index.php outside the public folder allow the server to run form either folder
+with the same behaviour.
 
 Requires php7 or higher.
 

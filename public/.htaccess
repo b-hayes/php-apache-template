@@ -19,7 +19,7 @@ Options -Indexes
 RewriteRule ^(.*)/$ /$1 [L,R=301]
 
 #redirect to https://www if not a localhost, not dev, not qa, not www, or not https
-RewriteCond %{SERVER_ADDR} !^127.0.0.1|::1
+RewriteCond %{HTTP_HOST} !localhost(?::\d+)?$ [NC]
 RewriteCond %{HTTP_HOST} !^qa\.
 RewriteCond %{HTTP_HOST} !^dev\.
 RewriteCond %{HTTPS} off [OR]
