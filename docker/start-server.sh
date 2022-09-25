@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Lets use the project folder as the name for out docker container.
+# Lets use the project folder as the name for our docker container.
 PROJECT=`basename $(pwd)`
 
 # If port is Zero, a free port is assigned avoiding collisions with other projects.
