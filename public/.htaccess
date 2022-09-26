@@ -26,12 +26,17 @@ RewriteCond %{HTTPS} off [OR]
 RewriteCond %{HTTP_HOST} !^www\.
 RewriteRule ^(.*)$ https://www.%{HTTP_HOST}/$1 [R=301,L]
 
-#[black listed files types] redirects file requests to the index.php if blacklisted extention (except for index.php itself)
-RewriteCond %{REQUEST_URI} .*(.htaccess|.htpasswd|.ini|.psd|.log|.sh|.bash|.key|.php)$
+#[redriect hidden files] all files begining with dot will be directed to index.php
+RewriteRule (^\.|/\.) /index.php
+#[forbid hidden files] all files begining with dot are forbidden. (safer version of the above rule)
+RewriteRule (^\.|/\.) – [F]
+
+#[black listed files types] redirects file requests to the index.php if blacklisted extention (except for index.php)
+RewriteCond %{REQUEST_URI} .*(.conf|.ini|.psd|.log|.sh|.bash|.zsh|.key|.php|.md)$
 RewriteCond %{REQUEST_URI} !=/index.php
 RewriteRule .* /index.php [L,QSA]
 
-#[block ALL directories] redirects requests to the index.php if route does not lead to file.
+#[block ALL directories] redirects requests to the index.php if route does not lead to file (except for index.php)
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_URI} !=/index.php
 RewriteRule .* /index.php [L,QSA]
