@@ -24,8 +24,12 @@ try {
         'Error' => $error->getMessage(),
         ' file' => $error->getFile(),
         ' line' => $error->getLine(),
-        'trace' => $error->getTrace()
+        'trace' => $error->getTrace(),
+        ' http' => $_SERVER['REQUEST_METHOD'] . ': ' . $_SERVER['REQUEST_URI']
     ];
+    if ($error->getPrevious()) {
+        $errorInfo['cause'] = $error->getPrevious()->getTraceAsString();
+    }
 
     //log the error
     error_log(json_encode($errorInfo));
