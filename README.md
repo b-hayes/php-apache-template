@@ -13,7 +13,11 @@ are redirected to the public/index.php.
 An additional .htaccess and index.php outside the public folder allow the server to run form either folder
 with the same behaviour.
 
-Requires php7 or higher.
+Requires php7 or higher and composer.
+
+## Setup
+Run `composer init` to create a composer.json.
+Run the web server with docker `./docker/start-server.sh`.
 
 ## Licence
 Do what you want with this code.
