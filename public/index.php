@@ -47,7 +47,7 @@ try {
     }
 
     //respond with JSON if appropriate
-    if ($_SERVER['REQUEST_METHOD'] !== 'GET' || $_SERVER['HTTP_ACCEPT'] ?? null === 'application/json') {
+    if ($_SERVER['REQUEST_METHOD'] !== 'GET' || ($_SERVER['HTTP_ACCEPT'] ?? null) === 'application/json') {
         echo json_encode($errorResponse, $encodingOptions);
         return;
     }
