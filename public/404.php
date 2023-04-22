@@ -2,7 +2,7 @@
     <div class="middle" style="width: 100%;text-align: center;">
         <p style="font-size: xxx-large">
             <?php
-            http_response_code(500); //set it
+            http_response_code(404); //set it
             echo http_response_code() //echo it back
             ?>
         </p>
