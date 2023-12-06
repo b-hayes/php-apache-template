@@ -18,13 +18,14 @@ Options -Indexes
 #remove trailing slashes from all requests
 RewriteRule ^(.*)/$ /$1 [L,R=301]
 
+#NOTE: This one is commented out by default as it can break with servers that already do this for you.
 #redirect to https://www if not a localhost, not dev, not qa, not www, or not https
-RewriteCond %{HTTP_HOST} !localhost(?::\d+)?$ [NC]
-RewriteCond %{HTTP_HOST} !^qa\.
-RewriteCond %{HTTP_HOST} !^dev\.
-RewriteCond %{HTTPS} off [OR]
-RewriteCond %{HTTP_HOST} !^www\.
-RewriteRule ^(.*)$ https://www.%{HTTP_HOST}/$1 [R=301,L]
+#RewriteCond %{HTTP_HOST} !localhost(?::\d+)?$ [NC]
+#RewriteCond %{HTTP_HOST} !^qa\.
+#RewriteCond %{HTTP_HOST} !^dev\.
+#RewriteCond %{HTTPS} off [OR]
+#RewriteCond %{HTTP_HOST} !^www\.
+#RewriteRule ^(.*)$ https://www.%{HTTP_HOST}/$1 [R=301,L]
 
 #[redriect hidden files] all files begining with dot will be directed to index.php
 RewriteRule (^\.|/\.) /index.php
