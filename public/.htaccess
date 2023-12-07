@@ -41,3 +41,10 @@ RewriteRule .* /index.php [L,QSA]
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_URI} !=/index.php
 RewriteRule .* /index.php [L,QSA]
+
+# Cache control. 24hr cache limit for static files so clients are forced to update.
+<IfModule mod_headers.c>
+    <FilesMatch ".*">
+        Header set Cache-Control "public, max-age=86400"
+    </FilesMatch>
+</IfModule>
