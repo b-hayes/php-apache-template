@@ -42,9 +42,10 @@ RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_URI} !=/index.php
 RewriteRule .* /index.php [L,QSA]
 
-# Cache control. 24hr cache limit for static files so clients are forced to update.
+# Cache control. Cache for static files must be revalidated every hour.
 <IfModule mod_headers.c>
     <FilesMatch ".*">
-        Header set Cache-Control "public, max-age=86400"
+        Header set Cache-Control "max-age=3600, must-revalidate"
     </FilesMatch>
 </IfModule>
+
