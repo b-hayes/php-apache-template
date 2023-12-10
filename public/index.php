@@ -10,10 +10,21 @@ set_error_handler(function ($severity, $message, $file, $line) {
     throw new \ErrorException($message, 0, $severity, $file, $line);
 });
 
+$jsonRequest = $_SERVER['REQUEST_METHOD'] !== 'GET' || stripos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false;
 
 try {
-    require_once __DIR__ . '/../vendor/autoload.php';
+    //TODO: Uncomment this line if you are using composer libraries.
+    //require_once __DIR__ . '/../vendor/autoload.php';
 
+    if (!$jsonRequest) {
+        // add common head tags here. Browser should merge them with whatever your app returns.
+        echo <<<HTML
+            <head>
+                <link rel="icon" type="image/png" href="/favicon.png">
+                <link rel="stylesheet" href="/css/reset.css">
+            </head>
+            HTML;
+    }
     //start your application here.
     throw new \Exception('Check out this error page!');
 
@@ -47,7 +58,7 @@ try {
     }
 
     //respond with JSON if appropriate
-    if ($_SERVER['REQUEST_METHOD'] !== 'GET' || ($_SERVER['HTTP_ACCEPT'] ?? null) === 'application/json') {
+    if ($jsonRequest) {
         echo json_encode($errorResponse, $encodingOptions);
         return;
     }
@@ -62,10 +73,9 @@ try {
 }
 
 ?>
-
 <style>
-    <?=
-    //including it via php prevents the page flashing white before the css file is processed.
+    <?php
+    //injecting styles directly prevents the page flashing white before the css file is processed.
     include __DIR__ . '/css/global.css';
     ?>
 </style>

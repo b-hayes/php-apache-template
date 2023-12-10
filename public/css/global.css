@@ -1,4 +1,8 @@
-/*  Put all the universal styles here.  */
+/**
+Global initializer styles.
+This will be included in html output to prevent the screen flashing white before loading the css files.
+This file should be as small as possible as it will be loaded on every page refresh.
+ */
 
 /* Light mode */
 @media (prefers-color-scheme: light) {
