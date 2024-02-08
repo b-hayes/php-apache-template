@@ -4,7 +4,7 @@
 PROJECT=`basename $(pwd)`
 
 # If port is Zero, a free port is assigned avoiding collisions with other projects.
-PORT="5521"
+PORT="0"
 
 # Run docker
 #  -v "$(pwd)/docker/database:/var/lib/mysql" \
