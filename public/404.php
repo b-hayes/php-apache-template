@@ -6,7 +6,7 @@
             echo http_response_code() //echo it back
             ?>
         </p>
-        <h1>An unexpected error occurred.</h1>
+        <h1>Page not found.</h1>
     </div>
 </div>
 <style>
