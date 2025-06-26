@@ -51,13 +51,11 @@ git add .
 if ! git diff --cached --quiet; then
   echo -e "\033[0;32mThe following files are staged for commit:\033[0m" >&2
   git diff --cached --name-status | sed $'s/^/\033[0;32m/;s/$/\033[0m/' >&2
-  echo -en "\033[1;33mProceed with commit and push? [y/N]: \033[0m" >&2
-  read confirm
-  if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
-    echo "Aborting commit and push." >&2
-    exit 1
-  fi
-  git commit -m "Update from downstream project"
+  default_msg="Update from downstream project"
+  echo -e "\033[1;33mEnter commit message (default: '$default_msg'):\033[0m" >&2
+  read -e -i "$default_msg" commit_msg
+  commit_msg=${commit_msg:-$default_msg}
+  git commit -m "$commit_msg"
   PUSH_OUTPUT=$(git push --set-upstream origin "$BRANCH_NAME" 2>&1)
   # Look for PR link in push output and open if present
   PR_LINK=$(echo "$PUSH_OUTPUT" | grep -oE 'https://github.com/[^ ]+/pull/new/[^ ]+')
