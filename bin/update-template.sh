@@ -46,7 +46,17 @@ else
 fi
 
 git add .
+
+# Show staged changes and confirm before committing
 if ! git diff --cached --quiet; then
+  echo -e "\033[0;32mThe following files are staged for commit:\033[0m" >&2
+  git diff --cached --name-status | sed $'s/^/\033[0;32m/;s/$/\033[0m/' >&2
+  echo -en "\033[1;33mProceed with commit and push? [y/N]: \033[0m" >&2
+  read confirm
+  if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
+    echo "Aborting commit and push." >&2
+    exit 1
+  fi
   git commit -m "Update from downstream project"
   PUSH_OUTPUT=$(git push --set-upstream origin "$BRANCH_NAME" 2>&1)
   # Look for PR link in push output and open if present
