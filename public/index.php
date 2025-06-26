@@ -38,8 +38,20 @@ try {
         'trace' => $error->getTrace(),
         ' http' => $_SERVER['REQUEST_METHOD'] . ': ' . $_SERVER['REQUEST_URI']
     ];
-    if ($error->getPrevious()) {
-        $errorInfo['cause'] = $error->getPrevious()->getTraceAsString();
+    // Collect all previous exceptions recursively
+    $causes = [];
+    $prev = $error->getPrevious();
+    while ($prev) {
+        $causes[] = [
+            'message' => $prev->getMessage(),
+            'file' => $prev->getFile(),
+            'line' => $prev->getLine(),
+            'trace' => $prev->getTraceAsString()
+        ];
+        $prev = $prev->getPrevious();
+    }
+    if ($causes) {
+        $errorInfo['causes'] = $causes;
     }
 
     //log the error
