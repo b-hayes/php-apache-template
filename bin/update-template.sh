@@ -52,7 +52,15 @@ if ! git diff --cached --quiet; then
   # Look for PR link in push output and open if present
   PR_LINK=$(echo "$PUSH_OUTPUT" | grep -oE 'https://github.com/[^ ]+/pull/new/[^ ]+')
   if [ -n "$PR_LINK" ]; then
-    xdg-open "$PR_LINK" 2>/dev/null || open "$PR_LINK" 2>/dev/null || explorer.exe "$PR_LINK" 2>/dev/null || echo "Please open: $PR_LINK"
+    if command -v xdg-open >/dev/null 2>&1; then
+      xdg-open "$PR_LINK" >/dev/null 2>&1 &
+    elif command -v open >/dev/null 2>&1; then
+      open "$PR_LINK" >/dev/null 2>&1 &
+    elif command -v explorer.exe >/dev/null 2>&1; then
+      explorer.exe "$PR_LINK" >/dev/null 2>&1 &
+    else
+      echo "Please open: $PR_LINK"
+    fi
   fi
 else
   echo "No changes to commit."
