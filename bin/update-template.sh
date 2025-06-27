@@ -19,7 +19,6 @@ if [ -z "$TEMPLATE_DIR" ]; then
   git clone "$TEMPLATE_GIT_URL" "$TEMPLATE_DIR"
 fi
 
-# Handle --add option: update only the files provided, do not persist or use .updatefiles
 if [[ "$1" == "--add" ]]; then
   shift
   if [ $# -eq 0 ]; then
@@ -27,18 +26,22 @@ if [[ "$1" == "--add" ]]; then
     exit 1
   fi
   FILES_TO_UPDATE=("$@")
-# Handle --add-changed option: update only new/modified files in the current repo (excluding README.md)
 elif [[ "$1" == "--add-changed" ]]; then
   mapfile -t FILES_TO_UPDATE < <(git status --porcelain | awk '{print $2}' | grep -v '^README.md$')
   if [ ${#FILES_TO_UPDATE[@]} -eq 0 ]; then
     echo "No changed or new files to add."
     exit 0
   fi
-else
-  # Get all the files not git ignored in the repo, excluding README.md
+elif [[ "$1" == "--all-template-files" ]]; then
   cd "$TEMPLATE_DIR"
   FILES_TO_UPDATE=( $(git ls-files --others --exclude-standard --cached | grep -v -i '^README.md$') )
   cd - > /dev/null
+else
+  echo "Usage: $0 [--add <files...> | --add-changed | --all-template-files]"
+  echo "  --add <files...>           Add specific files to the template repo."
+  echo "  --add-changed              Add new/modified files in the current repo (excluding README.md)."
+  echo "  --all-template-files       Add all template files (excluding README.md)."
+  exit 0
 fi
 
 # Copy updated files
@@ -130,4 +133,3 @@ if ! git diff --cached --quiet; then
 else
   echo "No changes to commit."
 fi
-
