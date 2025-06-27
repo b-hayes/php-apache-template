@@ -7,9 +7,6 @@ TEMPLATE_GIT_URL="https://github.com/b-hayes/php-apache-template.git"
 TEMPLATE_DIRS=("$HOME/repo/php-apache-template" "$HOME/repo/b-hayes/php-apache-template" "../php-apache-template")
 TEMPLATE_DIR=""
 
-# Find all files tracked or untracked but not ignored by git, excluding README.md
-FILES_TO_UPDATE=( $(git ls-files --others --exclude-standard --cached | grep -v -i '^README.md$') )
-
 # Determine possible template directories
 for dir in "${TEMPLATE_DIRS[@]}"; do
   if [ -d "$dir/.git" ]; then
@@ -20,6 +17,28 @@ done
 if [ -z "$TEMPLATE_DIR" ]; then
   TEMPLATE_DIR="${TEMPLATE_DIRS[0]}"
   git clone "$TEMPLATE_GIT_URL" "$TEMPLATE_DIR"
+fi
+
+# Handle --add option: update only the files provided, do not persist or use .updatefiles
+if [[ "$1" == "--add" ]]; then
+  shift
+  if [ $# -eq 0 ]; then
+    echo "No files specified to add."
+    exit 1
+  fi
+  FILES_TO_UPDATE=("$@")
+# Handle --add-changed option: update only new/modified files in the current repo (excluding README.md)
+elif [[ "$1" == "--add-changed" ]]; then
+  mapfile -t FILES_TO_UPDATE < <(git status --porcelain | awk '{print $2}' | grep -v '^README.md$')
+  if [ ${#FILES_TO_UPDATE[@]} -eq 0 ]; then
+    echo "No changed or new files to add."
+    exit 0
+  fi
+else
+  # Get all the files not git ignored in the repo, excluding README.md
+  cd "$TEMPLATE_DIR"
+  FILES_TO_UPDATE=( $(git ls-files --others --exclude-standard --cached | grep -v -i '^README.md$') )
+  cd - > /dev/null
 fi
 
 # Copy updated files
