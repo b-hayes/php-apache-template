@@ -52,6 +52,44 @@ done
 # Commit and push changes
 cd "$TEMPLATE_DIR"
 
+# Intelligent commit message generation
+status_output=$(git status --porcelain)
+added_files=($(echo "$status_output" | awk '$1 ~ /^A/ {print $2}'))
+modified_files=($(echo "$status_output" | awk '$1 ~ /^M/ {print $2}'))
+deleted_files=($(echo "$status_output" | awk '$1 ~ /^D/ {print $2}'))
+
+commit_msg=""
+if [ ${#added_files[@]} -gt 0 ]; then
+  if [ ${#added_files[@]} -eq 1 ]; then
+    commit_msg="Added ${added_files[0]}"
+  else
+    commit_msg="Added ${added_files[0]} and others"
+  fi
+fi
+if [ ${#modified_files[@]} -gt 0 ]; then
+  if [ -n "$commit_msg" ]; then
+    commit_msg+="; "
+  fi
+  if [ ${#modified_files[@]} -eq 1 ]; then
+    commit_msg+="Updated ${modified_files[0]}"
+  else
+    commit_msg+="Updated ${modified_files[0]} and others"
+  fi
+fi
+if [ ${#deleted_files[@]} -gt 0 ]; then
+  if [ -n "$commit_msg" ]; then
+    commit_msg+="; "
+  fi
+  if [ ${#deleted_files[@]} -eq 1 ]; then
+    commit_msg+="Removed ${deleted_files[0]}"
+  else
+    commit_msg+="Removed ${deleted_files[0]} and others"
+  fi
+fi
+if [ -z "$commit_msg" ]; then
+  commit_msg="Update from $CURR_FOLDER_NAME"
+fi
+
 # Get current folder name for branch
 CURR_FOLDER_NAME=$(basename "$(git rev-parse --show-toplevel)")
 BRANCH_NAME="update-from-$CURR_FOLDER_NAME"
@@ -70,10 +108,10 @@ git add .
 if ! git diff --cached --quiet; then
   echo -e "\033[0;32mThe following files are staged for commit:\033[0m" >&2
   git diff --cached --name-status | sed $'s/^/\033[0;32m/;s/$/\033[0m/' >&2
-  default_msg="Update from downstream project"
-  echo -e "\033[1;33mEnter commit message (default: '$default_msg'):\033[0m" >&2
-  read -e -i "$default_msg" commit_msg
-  commit_msg=${commit_msg:-$default_msg}
+  # Use the intelligent commit_msg as the default
+  echo -e "\033[1;33mEnter commit message (default: '$commit_msg'):\033[0m" >&2
+  read -e -i "$commit_msg" user_commit_msg
+  commit_msg=${user_commit_msg:-$commit_msg}
   git commit -m "$commit_msg"
   PUSH_OUTPUT=$(git push --set-upstream origin "$BRANCH_NAME" 2>&1)
   # Look for PR link in push output and open if present
@@ -92,3 +130,4 @@ if ! git diff --cached --quiet; then
 else
   echo "No changes to commit."
 fi
+
