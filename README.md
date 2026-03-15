@@ -19,11 +19,13 @@ run exactly the same when forced by shared hosting providers to put the entire r
 Additional htaccess for src/ blocks public access to source files regardless of server setup.
 
 # Requires:
-apache with mod_rewrite enabled and php.
+apache with mod_rewrite enabled and php 8.0+.
 
 # Recommended development setup:
 - Clone the repo and delete the .git folder
 - Run `composer init` and set up PSR-4 autoloading with src/ as the namespace root (default setting).
+- Run `composer dump-autoload` to generate the autoloader.
+- Run `docker compose up` to start the server (random port will be assigned unlees you set the PORT env variable in a .env file).
 
 ## Licence
 Do what you want with this code.
