@@ -5,25 +5,33 @@ A minimal web server starter pack with:
  - a top level error handler with developer friendly error response 
  - basic error page 
  - basic dark mode css
- - minimal docker support
+ - basic docker compose setup
 
-All requests for php files, directories, or sensitive files
-are redirected to the public/index.php.
+## Universal Structure.
 
-An additional .htaccess and index.php outside the public folder allow the server to run form either folder
-with the same behaviour.
+The project structure is compatible with docker and native apache and shared hosting setups.
 
-Requires php7 or higher and composer.
+All requests are redirected to the public/index.php.
 
-## Setup
-Run `composer init` to create a composer.json.
-Run the web server with docker `./docker/start-server.sh`.
+An additional .htaccess and index.php outside the public folder allow the server to
+run exactly the same when forced by shared hosting providers to put the entire repo in a public web root.
+
+Additional htaccess for src/ blocks public access to source files regardless of server setup.
+
+# Requires:
+apache with mod_rewrite enabled and php 8.0+.
+
+# Recommended development setup:
+- Clone the repo and delete the .git folder
+- Run `composer init` and set up PSR-4 autoloading with src/ as the namespace root (default setting).
+- Run `composer dump-autoload` to generate the autoloader.
+- Run `docker compose up` to start the server (random port will be assigned unlees you set the PORT env variable in a .env file).
 
 ## Licence
 Do what you want with this code.
 
-It comes as is with no warranty and the author
+It comes as is with no warranty, and the author
 accepts no liability in any way for how it is used.
 
-You do not have to keep a copy this licence with the code,
-once you delete it the code is yours and I expect no credit.
+You do not have to keep a copy this license with the code,
+once you delete it, the code is yours, and I expect no credit.

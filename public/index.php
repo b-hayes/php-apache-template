@@ -10,7 +10,17 @@ set_error_handler(function ($severity, $message, $file, $line) {
     throw new \ErrorException($message, 0, $severity, $file, $line);
 });
 
-$jsonRequest = $_SERVER['REQUEST_METHOD'] !== 'GET' || stripos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false;
+$host = explode(':', $_SERVER['HTTP_HOST'])[0]; // strip port if present
+$developerMode = $host === 'localhost' || str_ends_with($host, '.local');
+
+$jsonRequest = str_contains($_SERVER['HTTP_ACCEPT'] ?? '', 'application/json')
+    || str_contains($_SERVER['CONTENT_TYPE'] ?? '', 'application/json')
+    || $_SERVER['REQUEST_METHOD'] !== 'GET';
+
+$jsonEncodeOptions = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR;
+if ($developerMode) {
+    $jsonEncodeOptions |= JSON_PRETTY_PRINT;
+}
 
 try {
     //TODO: Uncomment this line if you are using composer libraries.
@@ -19,6 +29,7 @@ try {
     if (!$jsonRequest) {
         // add common head tags here. Browser should merge them with whatever your app returns.
         echo <<<HTML
+            <!DOCTYPE html>
             <head>
                 <link rel="icon" type="image/png" href="/favicon.png">
                 <link rel="stylesheet" href="/css/reset.css">
@@ -29,53 +40,75 @@ try {
     throw new \Exception('Check out this error page!');
 
 } catch (\Throwable $error) {
-    //This is the last line of defence do not use any dependencies that could break.
+    //This is the last line of defense do not use any dependencies that could break.
 
-    $errorInfo = [//for developers eyes only
+    // Redact sensitive fields from trace arrays before logging
+    $sanitize = function (mixed $data) use (&$sanitize): mixed {
+        if (!is_array($data)) return $data;
+        foreach ($data as $key => $value) {
+            if (is_string($key) && stripos($key, 'password') !== false) {
+                $data[$key] = '[REDACTED]';
+            } else {
+                $data[$key] = $sanitize($value);
+            }
+        }
+        return $data;
+    };
+
+    $errorInfo = [
         'Error' => $error->getMessage(),
         ' file' => $error->getFile(),
         ' line' => $error->getLine(),
-        'trace' => $error->getTrace(),
+        'trace' => $sanitize($error->getTrace()),
         ' http' => $_SERVER['REQUEST_METHOD'] . ': ' . $_SERVER['REQUEST_URI']
     ];
-    if ($error->getPrevious()) {
-        $errorInfo['cause'] = $error->getPrevious()->getTraceAsString();
+    // Collect all previous exceptions recursively
+    $causes = [];
+    $prev = $error->getPrevious();
+    while ($prev) {
+        $causes[] = [
+            'message' => $prev->getMessage(),
+            'file'    => $prev->getFile(),
+            'line'    => $prev->getLine(),
+            'trace'   => $prev->getTraceAsString()
+        ];
+        $prev = $prev->getPrevious();
+    }
+    if ($causes) {
+        $errorInfo['causes'] = $causes;
     }
 
     //log the error
     error_log(json_encode($errorInfo));
 
     //construct error response.
-    http_response_code(500);
+    if (!headers_sent()) http_response_code(500);
     $errorResponse = ['error' => ['message' => 'Internal server error']];
-    $encodingOptions = JSON_UNESCAPED_SLASHES;
 
     //extra info for developers.
-    $developerMode = (stripos($_SERVER['HTTP_HOST'], 'localhost') !== false);
     if ($developerMode) {
         $errorResponse['error_details'] = $errorInfo;
-        $encodingOptions = $encodingOptions | JSON_PRETTY_PRINT;
     }
 
     //respond with JSON if appropriate
     if ($jsonRequest) {
-        echo json_encode($errorResponse, $encodingOptions);
+        if (!headers_sent()) header('Content-Type: application/json');
+        echo json_encode($errorResponse, $jsonEncodeOptions);
         return;
     }
 
-    //otherwise assume we want a nice html error page.
+    //otherwise assume we want a nice HTML error page.
     include __DIR__ . '/500.php';
     if ($developerMode) {
         echo "<pre style='z-index: 99999999999999999;'>";
-        echo json_encode($errorResponse, $encodingOptions);
+        echo json_encode($errorResponse, $jsonEncodeOptions);
         echo "</pre>";
     }
 }
-
 ?>
 <style>
     <?php
-    //injecting styles directly prevents the page flashing white before the css file is processed.
+    //injecting basic styles directly to prevent flash-banging dark mode users before the rest of the CSS loads.
     include __DIR__ . '/css/global.css';
     ?>
 </style>
