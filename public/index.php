@@ -11,16 +11,28 @@ set_error_handler(function ($severity, $message, $file, $line) {
 });
 
 $host = explode(':', $_SERVER['HTTP_HOST'])[0]; // strip port if present
-$developerMode = $host === 'localhost' || str_ends_with($host, '.local');
-
-$jsonRequest = str_contains($_SERVER['HTTP_ACCEPT'] ?? '', 'application/json')
-    || str_contains($_SERVER['CONTENT_TYPE'] ?? '', 'application/json')
-    || $_SERVER['REQUEST_METHOD'] !== 'GET';
-
+$developerMode = str_ends_with($host, 'localhost') || str_ends_with($host, '.local');
 $jsonEncodeOptions = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR;
 if ($developerMode) {
     $jsonEncodeOptions |= JSON_PRETTY_PRINT;
 }
+
+// Catch fatal errors that crash php before any catch block can handle them.
+register_shutdown_function(function () use ($developerMode, $jsonEncodeOptions) {
+    $error = error_get_last();
+    error_log('Fatal Error: ' . json_encode($error));
+    ob_clean();
+    if (!headers_sent()) http_response_code(500);
+    echo '<h3>Fatal Server Error</h3>';
+    if ($developerMode) {
+        echo "<pre>" . json_encode($error, $jsonEncodeOptions) . "</pre>";
+    }
+});
+
+
+$jsonRequest = str_contains($_SERVER['HTTP_ACCEPT'] ?? '', 'application/json')
+    || str_contains($_SERVER['CONTENT_TYPE'] ?? '', 'application/json')
+    || $_SERVER['REQUEST_METHOD'] !== 'GET';
 
 try {
     //TODO: Uncomment this line if you are using composer libraries.
