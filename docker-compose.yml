@@ -1,0 +1,9 @@
+services:
+  app:
+    image: php:8-apache
+    ports:
+      - "${PORT:-0}:80"
+    volumes:
+      - .:/var/www/html
+      - ./docker/apache.conf:/etc/apache2/sites-enabled/000-default.conf
+    user: "1000:1000"
